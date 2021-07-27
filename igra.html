@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Igraj - "Ćilim"</title>
+
+	<link rel = "icon" href = "https://i.pinimg.com/236x/60/50/17/605017fdc1155c6e2decc088eb923de1.jpg"  
+        type = "image/x-icon"> 
+
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="style.css">
+
+		<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	 <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+		<!-- Popper JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+		<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+			
+</head>
+
+<!-- Pozicija klika u odnosu na trenutni element -->
+<!-- https://stackoverflow.com/questions/4249648/jquery-get-mouse-position-within-an-element --> 
+
+<body>
+	<!--<h1>Ćilim</h1>-->
+	<nav id = "glavniheder" class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <!-- Brand/logo -->
+  <a class="navbar-brand" href="pocetna.html"><img style="width: 100; height: 100px;" src="https://www.mreza-mira.net/wp-content/uploads/2019/03/%C4%87ilim%C4%8Dina.jpg"></a>
+  
+  <!-- Links -->
+  <ul class="navbar-nav">
+
+    <li class="nav-item">
+      <a id ="poruka" class="nav-link" style="color: black" href="igra.html">Unesite igrače</a>
+    </li>
+    
+  </ul>
+</nav>
+
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+	      <p id="prviIgrac"></p>
+	    </div>
+	    <div class="col-sm">
+	      <p id="drugiIgrac"></p>
+	    </div>
+	  </div>
+	</div>
+
+	
+
+	<div class="container" id="polja">
+		<div class="row">
+			<div class="col-md-4">
+				<button id="small" class="btn-dark opcija">MALO</button>
+			</div>
+			<div class="col-md-4">
+				<button id="medium" class="btn-dark opcija">SREDNJE</button>
+			</div>
+			<div class="col-md-4">
+				<button id="large" class="btn-dark opcija">VELIKO</button>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Meni na kraju igre -->
+	 <!-- A vertical navbar -->
+
+	<div id ="meni" class="jumbotron">
+  <h1 id="pobjednik">Pobjednik je <span id="nick"></span> sa <span id="pts"></span> zatvorenih kvadratića!</h1>
+  <p><i>Igrajte ponovo ili se vratite na početnu stranicu</i></p>
+
+  <div id="krajlista" class="list-group meni">
+  	<a href="igra.html" class="list-group-item list-group-item-action">Nova igra</a>
+  	<a href="pocetna.html" class="list-group-item list-group-item-action">Povratak na početnu</a>
+  </div> 
+
+</div>
+
+	
+	<div id="polje"></div>
+
+	<div class="container" id="zaSakrit">
+		  <form>
+		    <div class="form-group">
+				   <label for="prvi">Prvi igrač:</label>
+				   <input type="prvi" class="form-control" id="prvi" placeholder="Ime igrača (PLAVA BOJA)" name="prvi">
+			</div>
+		    <div class="form-group">
+				   <label for="drugi">Drugi igrač:</label>
+				   <input type="drugi" class="form-control" id="drugi" placeholder="Ime igrača (CRVENA BOJA)" name="drugi">
+			</div>
+		    
+		    <button type="button" id="dugmeIgraci" class="btn btn-primary">Potvrdi</button>
+		  </form>
+	</div>
+
+	<!--dummy elementi za uporedjivanje-->
+	<div id="dummy_red" style="color:red;"></div>
+	<div id="dummy_blue" style="color:blue;"></div>
+	<div id="dummy_black" style="color:black;"></div>
+
+	<!-- JS KOD -->
+	<script type="text/javascript">
+
+			$("#polja").hide();
+		
+			$("#dugmeIgraci").click(function(){
+				var prvi = $('#prvi').val();
+			    var drugi = $('#drugi').val();
+			    $("#zaSakrit").hide();
+			    $("#poruka").text("Odaberite veličinu polja");
+			    $("#polja").show();
+			});
+
+			$("#prviIgrac").hide();
+			$("#drugiIgrac").hide();
+
+			$("#meni").hide();
+
+			function zatvoreni(blok){
+				let prviUslov = ($(blok).css('border-bottom-color') === $("#dummy_red").css('color')) || ($(blok).css('border-bottom-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-bottom-color') === $('#dummy_black').css('color'));
+
+				let drugiUslov = ($(blok).css('border-top-color') === $("#dummy_red").css('color')) || ($(blok).css('border-top-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-top-color') === $('#dummy_black').css('color'));
+
+				let treciUslov = ($(blok).css('border-left-color') === $("#dummy_red").css('color')) || ($(blok).css('border-left-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-left-color') === $('#dummy_black').css('color'));
+
+				let cetvrtiUslov = ($(blok).css('border-right-color') === $("#dummy_red").css('color')) || ($(blok).css('border-right-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-right-color') === $('#dummy_black').css('color'));
+				
+				if(prviUslov && drugiUslov && treciUslov && cetvrtiUslov){
+					    return true;
+					}
+					else{
+					    return false;
+					}
+			}
+
+			function zatvoreniPored(blok, najblizi){
+				var idBloka = $(blok).attr("id");
+
+				if(idBloka.length == 3){
+					var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) - 1); 
+					var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) + 1);
+					var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2];
+					var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2];
+				}
+
+				else{
+					if((idBloka[1] + idBloka[2]) == "10"){
+						 var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) - 1);    
+                         var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) + 1);
+                         var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) + 1) + idBloka[3];     
+                         var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) - 1) + idBloka[3];
+					}
+					else{ // [2] + [3] == "10"
+						var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) -1);
+                        var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) +1);
+                        var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2] + idBloka[3];
+                        var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2] + idBloka[3];
+					}
+				}
+
+				if(najblizi == "lijevi"){
+					
+					let prviUslov = ($(idBlokaLijevo).css('border-bottom-color') === $("#dummy_red").css('color')) || ($(idBlokaLijevo).css('border-bottom-color') === $('#dummy_blue').css('color')) || ($(idBlokaLijevo).css('border-bottom-color') === $('#dummy_black').css('color'));
+
+					let drugiUslov = ($(idBlokaLijevo).css('border-top-color') === $("#dummy_red").css('color')) || ($(idBlokaLijevo).css('border-top-color') === $('#dummy_blue').css('color')) || ($(idBlokaLijevo).css('border-top-color') === $('#dummy_black').css('color'));
+
+					let treciUslov = ($(idBlokaLijevo).css('border-left-color') === $("#dummy_red").css('color')) || ($(idBlokaLijevo).css('border-left-color') === $('#dummy_blue').css('color')) || ($(idBlokaLijevo).css('border-left-color') === $('#dummy_black').css('color'));
+
+					let cetvrtiUslov = ($(idBlokaLijevo).css('border-right-color') === $("#dummy_red").css('color')) || ($(idBlokaLijevo).css('border-right-color') === $('#dummy_blue').css('color')) || ($(idBlokaLijevo).css('border-right-color') === $('#dummy_black').css('color'));
+					if(prviUslov && drugiUslov && treciUslov && cetvrtiUslov)
+					    return true;
+					return false;
+				}
+				else if(najblizi == "desni"){
+					
+					let prviUslov = ($(idBlokaDesno).css('border-bottom-color') === $("#dummy_red").css('color')) || ($(idBlokaDesno).css('border-bottom-color') === $('#dummy_blue').css('color')) || ($(idBlokaDesno).css('border-bottom-color') === $('#dummy_black').css('color'));
+
+					let drugiUslov = ($(idBlokaDesno).css('border-top-color') === $("#dummy_red").css('color')) || ($(idBlokaDesno).css('border-top-color') === $('#dummy_blue').css('color')) || ($(idBlokaDesno).css('border-top-color') === $('#dummy_black').css('color'));
+
+					let treciUslov = ($(idBlokaDesno).css('border-left-color') === $("#dummy_red").css('color')) || ($(idBlokaDesno).css('border-left-color') === $('#dummy_blue').css('color')) || ($(idBlokaDesno).css('border-left-color') === $('#dummy_black').css('color'));
+
+					let cetvrtiUslov = ($(idBlokaDesno).css('border-right-color') === $("#dummy_red").css('color')) || ($(idBlokaDesno).css('border-right-color') === $('#dummy_blue').css('color')) || ($(idBlokaDesno).css('border-right-color') === $('#dummy_black').css('color'));
+					if(prviUslov && drugiUslov && treciUslov && cetvrtiUslov)
+					    return true;
+					return false;
+				}
+				else if(najblizi == "gornji"){
+					
+					let prviUslov = ($(idBlokaIznad).css('border-bottom-color') === $("#dummy_red").css('color')) || ($(idBlokaIznad).css('border-bottom-color') === $('#dummy_blue').css('color')) || ($(idBlokaIznad).css('border-bottom-color') === $('#dummy_black').css('color'));
+
+					let drugiUslov = ($(idBlokaIznad).css('border-top-color') === $("#dummy_red").css('color')) || ($(idBlokaIznad).css('border-top-color') === $('#dummy_blue').css('color')) || ($(idBlokaIznad).css('border-top-color') === $('#dummy_black').css('color'));
+
+					let treciUslov = ($(idBlokaIznad).css('border-left-color') === $("#dummy_red").css('color')) || ($(idBlokaIznad).css('border-left-color') === $('#dummy_blue').css('color')) || ($(idBlokaIznad).css('border-left-color') === $('#dummy_black').css('color'));
+
+					let cetvrtiUslov = ($(idBlokaIznad).css('border-right-color') === $("#dummy_red").css('color')) || ($(idBlokaIznad).css('border-right-color') === $('#dummy_blue').css('color')) || ($(idBlokaIznad).css('border-right-color') === $('#dummy_black').css('color'));
+					if(prviUslov && drugiUslov && treciUslov && cetvrtiUslov)
+					    return true;
+					return false;
+				}
+				else if(najblizi =="donji"){
+					
+					let prviUslov = ($(idBlokaIspod).css('border-bottom-color') === $("#dummy_red").css('color')) || ($(idBlokaIspod).css('border-bottom-color') === $('#dummy_blue').css('color')) || ($(idBlokaIspod).css('border-bottom-color') === $('#dummy_black').css('color'));
+
+					let drugiUslov = ($(idBlokaIspod).css('border-top-color') === $("#dummy_red").css('color')) || ($(idBlokaIspod).css('border-top-color') === $('#dummy_blue').css('color')) || ($(idBlokaIspod).css('border-top-color') === $('#dummy_black').css('color'));
+
+					let treciUslov = ($(idBlokaIspod).css('border-left-color') === $("#dummy_red").css('color')) || ($(idBlokaIspod).css('border-left-color') === $('#dummy_blue').css('color')) || ($(idBlokaIspod).css('border-left-color') === $('#dummy_black').css('color'));
+
+					let cetvrtiUslov = ($(idBlokaIspod).css('border-right-color') === $("#dummy_red").css('color')) || ($(idBlokaIspod).css('border-right-color') === $('#dummy_blue').css('color')) || ($(idBlokaIspod).css('border-right-color') === $('#dummy_black').css('color'));
+					if(prviUslov && drugiUslov && treciUslov && cetvrtiUslov)
+					    return true;
+					return false;
+				}
+				
+			}
+
+			function lijevaObojena(blok){
+				if(($(blok).css('border-left-color') === $("#dummy_red").css('color')) || ($(blok).css('border-left-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-left-color') === $('#dummy_black').css('color'))) {
+						return true;
+					}
+					return false;
+				}
+
+			function desnaObojena(blok){
+				if(($(blok).css('border-right-color') === $("#dummy_red").css('color')) || ($(blok).css('border-right-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-right-color') === $('#dummy_black').css('color'))){
+					return true;
+				}
+				return false;
+			}
+
+			function gornjaObojena(blok){
+				if(($(blok).css('border-top-color') === $("#dummy_red").css('color')) || ($(blok).css('border-top-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-top-color') === $('#dummy_black').css('color'))){
+					return true;
+				}
+				return false;
+			}
+
+			function donjaObojena(blok){
+				if(($(blok).css('border-bottom-color') === $("#dummy_red").css('color')) || ($(blok).css('border-bottom-color') === $('#dummy_blue').css('color')) || ($(blok).css('border-bottom-color') === $('#dummy_black').css('color'))){
+					return true;
+				}
+				return false;
+			}
+
+			// FUNKCIJE ZA BOJENJE
+
+			function obojiLijevuPlavo(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) - 1);
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) - 1);
+					else
+						var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) -1);
+				}
+				$(blok).css("border-left","2px solid blue");
+				$(idBlokaLijevo).css("border-right","2px solid blue");
+			}
+			function obojiLijevuCrveno(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) - 1);
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) - 1);
+					else
+						var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) -1);
+				}
+				$(blok).css("border-left","2px solid red");
+				$(idBlokaLijevo).css("border-right","2px solid red");
+			}
+
+			function obojiDesnuPlavo(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) + 1);
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) + 1);
+					else
+						var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) +1);
+				}
+				$(blok).css("border-right","2px solid blue");
+				$(idBlokaDesno).css("border-left","2px solid blue");
+			}
+
+			function obojiDesnuCrveno(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) + 1);
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) + 1);
+					else
+						var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) +1);
+				}
+				$(blok).css("border-right","2px solid red");
+				$(idBlokaDesno).css("border-left","2px solid red");
+			}
+
+			function obojiGornjuPlavo(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2];
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) - 1) + idBloka[3];
+					else
+						var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2] + idBloka[3];
+				}
+				$(blok).css("border-top","2px solid blue");
+				$(idBlokaIznad).css("border-bottom","2px solid blue");
+			}
+
+			function obojiGornjuCrveno(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2];
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) - 1) + idBloka[3];
+					else
+						var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2] + idBloka[3];
+				}
+				$(blok).css("border-top","2px solid red");
+				$(idBlokaIznad).css("border-bottom","2px solid red");
+			}
+
+			function obojiDonjuPlavo(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2];
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) + 1) + idBloka[3];
+					else
+						var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2] + idBloka[3];
+				}		
+				$(blok).css("border-bottom","2px solid blue");
+				$(idBlokaIspod).css("border-top","2px solid blue");
+			}
+
+			function obojiDonjuCrveno(blok){
+				var idBloka = $(blok).attr("id");
+				if(idBloka.length == 3)
+					var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2];
+				else{
+					if((idBloka[1] + idBloka[2]) == "10")
+						var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) + 1) + idBloka[3];
+					else
+						var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2] + idBloka[3];
+				}	
+				$(blok).css("border-bottom","2px solid red");
+				$(idBlokaIspod).css("border-top","2px solid red");
+			}
+
+			function baklavaPopunjenaMalo(polja){
+				let i = 0;
+				polja.forEach(function (item, index) {
+				  if(zatvoreni(item))
+				  	i++;
+				});
+				if(i == 21)
+					return true;
+				return false;
+			}
+
+			function baklavaPopunjenaSrednje(polja){
+				let i = 0;
+				polja.forEach(function (item, index) {
+				  if(zatvoreni(item))
+				  	i++;
+				});
+				if(i == 37)
+					return true;
+				return false;
+			}
+
+			function baklavaPopunjenaVeliko(polja){
+				let i = 0;
+				polja.forEach(function (item, index) {
+				  if(zatvoreni(item))
+				  	i++;
+				});
+				if(i == 57)
+					return true;
+				return false;
+			}
+			
+
+		mat9 = [[0,0,0,0,0,0,0,0,0],  
+		        [0,0,0,0,1,0,0,0,0],
+		        [0,0,0,1,0,1,0,0,0],
+		        [0,0,1,0,0,0,1,0,0],
+		        [0,1,0,0,0,0,0,1,0],
+		        [0,0,1,0,0,0,1,0,0],
+		        [0,0,0,1,0,1,0,0,0],
+		        [0,0,0,0,1,0,0,0,0],
+		        [0,0,0,0,0,0,0,0,0]];
+
+		mat11 =[[0,0,0,0,0,0,0,0,0,0,0], 
+		        [0,0,0,0,0,1,0,0,0,0,0],
+		        [0,0,0,0,1,0,1,0,0,0,0],
+		        [0,0,0,1,0,0,0,1,0,0,0],
+		        [0,0,1,0,0,0,0,0,1,0,0],
+		        [0,1,0,0,0,0,0,0,0,1,0],
+		        [0,0,1,0,0,0,0,0,1,0,0],
+		        [0,0,0,1,0,0,0,1,0,0,0],
+		        [0,0,0,0,1,0,1,0,0,0,0],
+		        [0,0,0,0,0,1,0,0,0,0,0],
+		        [0,0,0,0,0,0,0,0,0,0,0]];
+
+		mat13 = [[0,0,0,0,0,0,0,0,0,0,0,0,0], 
+		         [0,0,0,0,0,0,1,0,0,0,0,0,0],
+		         [0,0,0,0,0,1,0,1,0,0,0,0,0],
+		         [0,0,0,0,1,0,0,0,1,0,0,0,0],
+		         [0,0,0,1,0,0,0,0,0,1,0,0,0],
+		         [0,0,1,0,0,0,0,0,0,0,1,0,0],
+		         [0,1,0,0,0,0,0,0,0,0,0,1,0],
+		         [0,0,1,0,0,0,0,0,0,0,1,0,0],
+		         [0,0,0,1,0,0,0,0,0,1,0,0,0],
+		         [0,0,0,0,1,0,0,0,1,0,0,0,0],
+		         [0,0,0,0,0,1,0,1,0,0,0,0,0],
+		         [0,0,0,0,0,0,1,0,0,0,0,0,0],
+		         [0,0,0,0,0,0,0,0,0,0,0,0,0]];
+
+		var izabranoPolje = 0;
+
+		// ISPIS 9x9 POLJA
+
+		$(document).ready(function(){
+		  $("#small").click(function(e){
+		  	e.stopPropagation();
+
+		  	$("#polja").hide();
+		  	$("#medium").hide();
+		  	$("#large").hide();
+
+		  	$("#poruka").text("Ćilim - igra u toku");
+
+		    for(let i = 0; i < 9; i++){
+		    	for(let j = 0; j < 9; j++){
+		    		let myId = "m" + String(i) + String(j); // ID
+		    		if(mat9[i][j] == 0){
+		    			let toAppend = "<div id=\"" + myId + "\" class=\"blok nula\"><span class=\"dot\"></span></div>";
+		    			$("#polje").append(toAppend);
+		    		}
+		    		else{
+		    			let toAppend = "<div id=\"" + myId + "\" class=\"blok jedinica\"><span class=\"dot\"></span></div>";
+		    			$("#polje").append(toAppend);
+		    		}
+
+		    	}
+		    	$("#polje").append("<br>");
+		    }
+
+		    // Oblik baklave (uklanjanje bordera)
+		    $("#m14").css('border-bottom','none');
+		    $("#m23, #m32").each(function(){ 
+                    $(this).css({"border-right": "none", "border-bottom":"none"}); 
+            	}); 
+		    $("#m41").css('border-right','none');
+		    $("#m52, #m63").each(function(){ 
+                    $(this).css({"border-right": "none", "border-top":"none"}); 
+            	}); 
+		    $("#m74").css('border-top','none');
+		    $("#m56, #m65").each(function(){ 
+                    $(this).css({"border-left": "none", "border-top":"none"}); 
+            	}); 
+		    $("#m47").css('border-left','none');
+		    $("#m25, #m36").each(function(){ 
+                    $(this).css({"border-left": "none", "border-bottom":"none"}); 
+            	}); 
+		    $("#small").hide();
+
+		    // IGRA NA 9x9 POLJU
+
+			// KLIKABILNA POLJA UNUTAR BAKLAVE (BEZ KRAJNJIH) 
+			
+			let klikabilna = ["#m23","#m24","#m25","#m32","#m33","#m34","#m35","#m36","#m42","#m43","#m44","#m45","#m46","#m52","#m53","#m54","#m55","#m56","#m63","#m64","#m65"];
+			for (let i = 0; i < klikabilna.length; i++){
+				$(klikabilna[i]).addClass("klik");
+			}
+
+			// ONCLICK LOGIKA ZA SVAKO POLJE - LOGIKA IGRE
+
+			prvi = {ime: prvi.value, score: 2};
+			drugi = {ime: drugi.value, score: 2};
+
+			$("#prviIgrac").show();
+			$("#drugiIgrac").show();
+
+			$("#prviIgrac").append(prvi.ime + " : " + prvi.score);
+			$("#drugiIgrac").append(drugi.ime + " : " + drugi.score);
+
+			var igraci = [prvi,drugi];
+			var naRedu = igraci[Math.floor(Math.random() * igraci.length)];
+			
+			if(naRedu.ime == prvi.ime){
+				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+			}
+			else{
+				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+			}
+
+			$("#m14").css("border-bottom","2px solid red");
+			$("#m14").find('span').css("background-color","red");
+			$("#m24").css("border-top","2px solid red");
+
+			$("#m74").css("border-top","2px solid red");
+			$("#m74").find('span').css("background-color","red");
+			$("#m64").css("border-bottom","2px solid red");
+
+			$("#m41").css("border-right","2px solid blue");
+			$("#m41").find('span').css("background-color","blue");
+			$("#m42").css("border-left","2px solid blue");
+
+			$("#m47").css("border-left","2px solid blue");
+			$("#m47").find('span').css("background-color","blue");
+			$("#m46").css("border-right","2px solid blue");
+
+			//Dodjela početnih poena
+			
+			$('.klik').click(function(e) {
+				
+				   var x = e.pageX - this.offsetLeft;
+   				   var y = e.pageY - this.offsetTop;
+   				   //console.log(x + " " + y);       X,Y koordinate unutar kliknutog bloka
+   				   //console.log($(this).width());       Sirina kliknutog bloka
+
+   				   let udaljenostL = x;
+   				   let udaljenostR = $(this).width() - x;
+
+   				   let udaljenostT = y;
+   				   let udaljenostB = $(this).width() - y;
+
+   				   if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostL && !lijevaObojena(this)) {
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) - 1);
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiLijevuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaLijevo).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaLijevo).find('span').css("background-color","blue");
+   				   			}
+
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiLijevuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaLijevo).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaLijevo).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   		
+   				   }
+
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostR && !desnaObojena(this)){
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) + 1);
+
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiDesnuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaDesno).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaDesno).find('span').css("background-color","blue");
+   				   			}
+
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiDesnuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaDesno).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaDesno).find('span').css("background-color","red");
+   				   			}
+
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   }
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostT && !gornjaObojena(this)){
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2];
+
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiGornjuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaIznad).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaIznad).find('span').css("background-color","blue");
+   				   			}
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiGornjuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaIznad).find('span').css("background-color","red");
+
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaIznad).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   }
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostB && !donjaObojena(this)){
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2];
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiDonjuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaIspod).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaIspod).find('span').css("background-color","blue");
+   				   			}
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiDonjuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaIspod).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaIspod).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+
+   				   }
+
+   				   if(baklavaPopunjenaMalo(klikabilna)){
+   				   			alert("Igra završena!");
+   				   			$("#poruka").text("Ćilim - igra završena")
+   				   			$("#polje").hide();
+   				   			$("#prviIgrac").hide();
+   				   			$("#drugiIgrac").hide();
+   				   			$("#meni").show();
+   				   			if(prvi.score > drugi.score){
+   				   				//$("#pobjednik").text("Pobjednik je " + prvi.ime + " sa " + prvi.score + " zatvorenih kvadratića!");
+   				   				$("#nick").text(prvi.ime);
+   				   				$("#nick").css('color','blue');
+   				   				$("#pts").text(prvi.score.toString());
+   				   			}
+   				   			else if(drugi.score > prvi.score){
+   				   				//$("#pobjednik").text("Pobjednik je " + drugi.ime + " sa " + drugi.score + " zatvorenih kvadratića!");
+   				   				$("#nick").text(drugi.ime);
+   				   				$("#nick").css('color','red');
+   				   				$("#pts").text(drugi.score.toString());
+   				   			}
+   				   			else{
+   				   				$("#pobjednik").text("Neriješeno!");
+   				   			}
+   				   		}
+
+			  });
+		  });
+		});
+
+			$(document).ready(function(){
+			  $("#medium").click(function(e){
+				e.stopPropagation();
+			  	$("#polja").hide();
+			  	$("#small").hide();
+			  	$("#large").hide();
+
+			  	$("#poruka").text("Ćilim - igra u toku");
+			    for(let i = 0; i < 11; i++){
+			    	for(let j = 0; j < 11; j++){
+			    		let myId = "m" + String(i) + String(j); // ID
+			    		if(mat11[i][j] == 0){
+			    			let toAppend = "<div id=\"" + myId + "\" class=\"blok nula\"><span class=\"dot\"></span></div>";
+			    			$("#polje").append(toAppend);
+			    		}
+			    		else{
+			    			let toAppend = "<div id=\"" + myId + "\" class=\"blok jedinica\"><span class=\"dot\"></span></div>";
+			    			$("#polje").append(toAppend);
+			    		}
+
+			    	}
+			    	$("#polje").append("<br>");
+			    }
+			    // Oblik baklave (uklanjanje bordera)
+			    $("#m15").css('border-bottom','none');
+
+			    $("#m24, #m33, #m42").each(function(){ 
+	                    $(this).css({"border-right": "none", "border-bottom":"none"}); 
+	            	}); 
+
+			    $("#m51").css('border-right','none');
+
+			    $("#m62, #m73, #m84").each(function(){ 
+	                    $(this).css({"border-right": "none", "border-top":"none"}); 
+	            	}); 
+
+			    $("#m95").css('border-top','none');
+
+			    $("#m86, #m77, #m68").each(function(){ 
+	                    $(this).css({"border-left": "none", "border-top":"none"}); 
+	            	}); 
+
+			    $("#m59").css('border-left','none');
+
+			    $("#m48, #m37, #m26").each(function(){ 
+	                    $(this).css({"border-left": "none", "border-bottom":"none"}); 
+	            	}); 
+
+			    $("#medium").hide();
+
+			    let klikabilna = ["#m24","#m25","#m26","#m33","#m34","#m35","#m36","#m37","#m42","#m43","#m44","#m45","#m46","#m47","#m48","#m52","#m53","#m54","#m55","#m56","#m57","#m58","#m62","#m63","#m64","#m65","#m66","#m67","#m68","#m73","#m74","#m75","#m76","#m77","#m84","#m85","#m86"];
+			    
+				for (let i = 0; i < klikabilna.length; i++){
+					$(klikabilna[i]).addClass("klik");
+				}
+
+				// ONCLICK LOGIKA ZA SVAKO POLJE - LOGIKA IGRE
+
+				prvi = {ime: prvi.value, score: 2};
+				drugi = {ime: drugi.value, score: 2};
+
+				$("#prviIgrac").show();
+				$("#drugiIgrac").show();
+
+				$("#prviIgrac").append(prvi.ime + " : " + prvi.score);
+				$("#drugiIgrac").append(drugi.ime + " : " + drugi.score);
+
+				var igraci = [prvi,drugi];
+				var naRedu = igraci[Math.floor(Math.random() * igraci.length)];
+				
+				if(naRedu.ime == prvi.ime){
+					document.getElementById("prviIgrac").style.backgroundColor = "blue";
+				}
+				else{
+					document.getElementById("drugiIgrac").style.backgroundColor = "red";
+				}
+
+				$("#m15").css("border-bottom","2px solid red");
+				$("#m15").find('span').css("background-color","red");
+				$("#m25").css("border-top","2px solid red");
+
+				$("#m95").css("border-top","2px solid red");
+				$("#m95").find('span').css("background-color","red");
+				$("#m85").css("border-bottom","2px solid red");
+
+				$("#m51").css("border-right","2px solid blue");
+				$("#m51").find('span').css("background-color","blue");
+				$("#m52").css("border-left","2px solid blue");
+
+				$("#m59").css("border-left","2px solid blue");
+				$("#m59").find('span').css("background-color","blue");
+				$("#m58").css("border-right","2px solid blue");
+
+				$('.klik').click(function(e) {
+				
+				   var x = e.pageX - this.offsetLeft;
+   				   var y = e.pageY - this.offsetTop;
+   				   //console.log(x + " " + y);       X,Y koordinate unutar kliknutog bloka
+   				   //console.log($(this).width());       Sirina kliknutog bloka
+
+   				   let udaljenostL = x;
+   				   let udaljenostR = $(this).width() - x;
+
+   				   let udaljenostT = y;
+   				   let udaljenostB = $(this).width() - y;
+
+   				   if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostL && !lijevaObojena(this)) {
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) - 1);
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiLijevuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaLijevo).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaLijevo).find('span').css("background-color","blue");
+   				   			}
+
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiLijevuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaLijevo).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaLijevo).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   		
+   				   }
+
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostR && !desnaObojena(this)){
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) + 1);
+
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiDesnuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaDesno).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaDesno).find('span').css("background-color","blue");
+   				   			}
+
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiDesnuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaDesno).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaDesno).find('span').css("background-color","red");
+   				   			}
+
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   }
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostT && !gornjaObojena(this)){
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2];
+
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiGornjuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaIznad).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaIznad).find('span').css("background-color","blue");
+   				   			}
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiGornjuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaIznad).find('span').css("background-color","red");
+
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaIznad).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   }
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostB && !donjaObojena(this)){
+   				   		let idBloka = $(this).attr("id");
+   				   		let idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2];
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiDonjuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaIspod).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaIspod).find('span').css("background-color","blue");
+   				   			}
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiDonjuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaIspod).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaIspod).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+
+   				   }
+
+   				   if(baklavaPopunjenaSrednje(klikabilna)){
+   				   			alert("Igra završena!");
+   				   			$("#poruka").text("Ćilim - igra završena")
+   				   			$("#polje").hide();
+   				   			$("#prviIgrac").hide();
+   				   			$("#drugiIgrac").hide();
+   				   			$("#meni").show();
+   				   			if(prvi.score > drugi.score){
+   				   				//$("#pobjednik").text("Pobjednik je " + prvi.ime + " sa " + prvi.score + " zatvorenih kvadratića!");
+   				   				$("#nick").text(prvi.ime);
+   				   				$("#nick").css('color','blue');
+   				   				$("#pts").text(prvi.score.toString());
+   				   			}
+   				   			else if(drugi.score > prvi.score){
+   				   				//$("#pobjednik").text("Pobjednik je " + drugi.ime + " sa " + drugi.score + " zatvorenih kvadratića!");
+   				   				$("#nick").text(drugi.ime);
+   				   				$("#nick").css('color','red');
+   				   				$("#pts").text(drugi.score.toString());
+   				   			}
+   				   			else{
+   				   				$("#pobjednik").text("Neriješeno!");
+   				   			}
+   				   		}
+
+			  });
+			});
+		});
+
+		$(document).ready(function(){
+			  $("#large").click(function(e){
+				e.stopPropagation();
+
+			  	$("#polja").hide();
+			  	$("#small").hide();
+			  	$("#medium").hide();
+
+			  	$("#poruka").text("Ćilim - igra u toku");
+			    for(let i = 0; i < 13; i++){
+			    	for(let j = 0; j < 13; j++){
+			    		let myId = "m" + String(i) + String(j); // ID
+			    		if(mat13[i][j] == 0){
+			    			let toAppend = "<div id=\"" + myId + "\" class=\"blok nula\"><span class=\"dot\"></span></div>";
+			    			$("#polje").append(toAppend);
+			    		}
+			    		else{
+			    			let toAppend = "<div id=\"" + myId + "\" class=\"blok jedinica\"><span class=\"dot\"></span></div>";
+			    			$("#polje").append(toAppend);
+			    		}
+
+			    	}
+			    	$("#polje").append("<br>");
+			    }
+			    
+			    // Oblik baklave (uklanjanje bordera)
+			    $("#m16").css('border-bottom','none');
+
+			    $("#m25, #m34, #m43, #m52").each(function(){ 
+	                    $(this).css({"border-right": "none", "border-bottom":"none"}); 
+	            	}); 
+
+			    $("#m61").css('border-right','none');             //NASTAVITI UKLANJATI BORDERE ZA LARGE POLJE 
+
+			    $("#m72, #m72, #m83, #m94, #m105").each(function(){ 
+	                    $(this).css({"border-right": "none", "border-top":"none"}); 
+	            	}); 
+
+			    $("#m116").css('border-top','none');
+
+			    $("#m107, #m98, #m89, #m710").each(function(){ 
+	                    $(this).css({"border-left": "none", "border-top":"none"}); 
+	            	}); 
+
+			    $("#m611").css('border-left','none');
+
+			    $("#m510, #m49, #m38, #m27").each(function(){ 
+	                    $(this).css({"border-left": "none", "border-bottom":"none"}); 
+	            	}); 
+
+			    $("#large").hide();
+
+			    let klikabilna = ["#m25","#m26","#m27","#m34","#m35","#m36","#m37","#m38","#m43","#m44","#m45","#m46","#m47","#m48","#m49","#m52","#m53","#m54","#m55","#m56","#m57","#m58","#m59","#m510","#m62","#m63","#m64","#m65","#m66","#m67","#m68","#m69","#m610","#m72","#m73","#m74","#m75","#m76","#m77","#m78","#m79","#m710","#m83","#m84","#m85","#m86","#m87","#m88","#m89","#m94","#m95","#m96","#m97","#m98","#m105","#m106","#m107"];
+			    
+				for (let i = 0; i < klikabilna.length; i++){
+					$(klikabilna[i]).addClass("klik");
+				}
+
+				// ONCLICK LOGIKA ZA SVAKO POLJE - LOGIKA IGRE
+
+				prvi = {ime: prvi.value, score: 2};
+				drugi = {ime: drugi.value, score: 2};
+
+				$("#prviIgrac").show();
+				$("#drugiIgrac").show();
+
+				$("#prviIgrac").append(prvi.ime + " : " + prvi.score);
+				$("#drugiIgrac").append(drugi.ime + " : " + drugi.score);
+
+				var igraci = [prvi,drugi];
+				var naRedu = igraci[Math.floor(Math.random() * igraci.length)];
+				
+				if(naRedu.ime == prvi.ime){
+					document.getElementById("prviIgrac").style.backgroundColor = "blue";
+				}
+				else{
+					document.getElementById("drugiIgrac").style.backgroundColor = "red";
+				}
+
+				$("#m16").css("border-bottom","2px solid red");
+				$("#m16").find('span').css("background-color","red");
+				$("#m26").css("border-top","2px solid red");
+
+				$("#m116").css("border-top","2px solid red");
+				$("#m116").find('span').css("background-color","red");
+				$("#m106").css("border-bottom","2px solid red");
+
+				$("#m61").css("border-right","2px solid blue");
+				$("#m61").find('span').css("background-color","blue");
+				$("#m62").css("border-left","2px solid blue");
+
+				$("#m611").css("border-left","2px solid blue");
+				$("#m611").find('span').css("background-color","blue");
+				$("#m610").css("border-right","2px solid blue");
+
+				$('.klik').click(function(e) {
+				
+				   var x = e.pageX - this.offsetLeft;
+   				   var y = e.pageY - this.offsetTop;
+   				   //console.log(x + " " + y);       X,Y koordinate unutar kliknutog bloka
+   				   //console.log($(this).width());       Sirina kliknutog bloka
+
+   				   let udaljenostL = x;
+   				   let udaljenostR = $(this).width() - x;
+
+   				   let udaljenostT = y;
+   				   let udaljenostB = $(this).width() - y;
+
+   				   if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostL && !lijevaObojena(this)) {
+   				   		var idBloka = $(this).attr("id");
+   				   		if(idBloka.length == 3)
+   				   			var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) - 1);
+   				   		else{
+   				   			if((idBloka[1] + idBloka[2]) == "10")
+   				   				var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) - 1);
+   				   			else
+   				   				var idBlokaLijevo = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) -1);
+   				   		}
+   				   		
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiLijevuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaLijevo).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaLijevo).find('span').css("background-color","blue");
+   				   			}
+
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiLijevuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaLijevo).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"lijevi")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaLijevo).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   		
+   				   }
+
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostR && !desnaObojena(this)){
+   				   		var idBloka = $(this).attr("id");
+   				   		if(idBloka.length == 3)
+   				   			var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2]) + 1);
+   				   		else{
+   				   			if((idBloka[1] + idBloka[2]) == "10")
+   				   				var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + idBloka[2] + (parseInt(idBloka[3]) + 1);
+   				   			else
+   				   				var idBlokaDesno = "#" + idBloka[0] + idBloka[1] + (parseInt(idBloka[2] + idBloka[3]) +1);
+   				   		}
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiDesnuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaDesno).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaDesno).find('span').css("background-color","blue");
+   				   			}
+
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiDesnuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaDesno).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"desni")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaDesno).find('span').css("background-color","red");
+   				   			}
+
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   }
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostT && !gornjaObojena(this)){
+   				   		var idBloka = $(this).attr("id");
+   				   		
+   				   		if(idBloka.length == 3)
+   				   			var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2];
+   				   		else{
+   				   			if((idBloka[1] + idBloka[2]) == "10")
+   				   				var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) - 1) + idBloka[3];
+   				   			else
+   				   				var idBlokaIznad = "#" + idBloka[0] + (parseInt(idBloka[1]) - 1) + idBloka[2] + idBloka[3];
+   				   		}
+
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiGornjuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaIznad).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaIznad).find('span').css("background-color","blue");
+   				   			}
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiGornjuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaIznad).find('span').css("background-color","red");
+
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"gornji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaIznad).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+   				   }
+   				   else if(Math.min(udaljenostL,udaljenostR,udaljenostT,udaljenostB) === udaljenostB && !donjaObojena(this)){
+   				   		var idBloka = $(this).attr("id");
+   				   		if(idBloka.length == 3)
+   				   			var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2];
+   				   		else{
+   				   			if((idBloka[1] + idBloka[2]) == "10")
+   				   				var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1] + idBloka[2]) + 1) + idBloka[3];
+   				   			else
+   				   				var idBlokaIspod = "#" + idBloka[0] + (parseInt(idBloka[1]) + 1) + idBloka[2] + idBloka[3];
+   				   		}
+   				   		if(naRedu.ime == prvi.ime){
+   				   			let zatvorio = false;
+   				   			obojiDonjuPlavo(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score += 2;
+   				   				$(this).find('span').css("background-color","blue");
+   				   				$(idBlokaIspod).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(this).find('span').css("background-color","blue");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				prvi.score++;
+   				   				$(idBlokaIspod).find('span').css("background-color","blue");
+   				   			}
+   				   			$("#prviIgrac").text(prvi.ime + " : " + prvi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "red";
+   				   				naRedu = drugi;
+   				   			}
+   				   		}
+
+   				   		else{
+   				   			let zatvorio = false;
+   				   			obojiDonjuCrveno(this);
+   				   			if(zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score += 2;
+   				   				$(this).find('span').css("background-color","red");
+   				   				$(idBlokaIspod).find('span').css("background-color","red");
+   				   			}
+   				   			else if(zatvoreni(this) && !zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(this).find('span').css("background-color","red");
+   				   			}
+   				   			else if(!zatvoreni(this) && zatvoreniPored(this,"donji")){
+   				   				zatvorio = true;
+   				   				drugi.score++;
+   				   				$(idBlokaIspod).find('span').css("background-color","red");
+   				   			}
+   				   			$("#drugiIgrac").text(drugi.ime + " : " + drugi.score);
+   				   			
+   				   			if(!zatvorio){
+   				   				document.getElementById("drugiIgrac").style.backgroundColor = "transparent";
+   				   				document.getElementById("prviIgrac").style.backgroundColor = "blue";
+   				   				naRedu = prvi;
+   				   			}
+   				   		}
+
+   				   }
+
+   				   if(baklavaPopunjenaVeliko(klikabilna)){
+   				   			alert("Igra završena!");
+   				   			$("#poruka").text("Ćilim - igra završena")
+   				   			$("#polje").hide();
+   				   			$("#prviIgrac").hide();
+   				   			$("#drugiIgrac").hide();
+   				   			$("#meni").show();
+   				   			if(prvi.score > drugi.score){
+   				   				//$("#pobjednik").text("Pobjednik je " + prvi.ime + " sa " + prvi.score + " zatvorenih kvadratića!");
+   				   				$("#nick").text(prvi.ime);
+   				   				$("#nick").css('color','blue');
+   				   				$("#pts").text(prvi.score.toString());
+   				   			}
+   				   			else if(drugi.score > prvi.score){
+   				   				//$("#pobjednik").text("Pobjednik je " + drugi.ime + " sa " + drugi.score + " zatvorenih kvadratića!");
+   				   				$("#nick").text(drugi.ime);
+   				   				$("#nick").css('color','red');
+   				   				$("#pts").text(drugi.score.toString());
+   				   			}
+   				   			else{
+   				   				$("#pobjednik").text("Neriješeno!");
+   				   			}
+   				   		}
+
+			  });
+			});
+	      });
+	</script>
+
+</body>
